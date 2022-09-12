@@ -19,6 +19,10 @@ public class StudentController {
 //            )
 //    );
 
+    @GetMapping
+    public String displayWelcomeMessage(){
+        return "<center><h1>Welcome to the Spring Boot Security!!!!</h1></center>";
+    }
     // Mappings - URL endpoints
     // Get the list of all student
     @GetMapping("/listStudents")
