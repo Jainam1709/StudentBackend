@@ -1,6 +1,11 @@
-package com.example.studentbackend.controller;
+package com.example.studentbackend.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Student {
+    @Id
     private Integer id;
     private String name;
     private String address;
@@ -9,6 +14,10 @@ public class Student {
         this.id = id;
         this.name = name;
         this.address = address;
+    }
+
+    public Student() {
+
     }
 
     public Integer getId() {
