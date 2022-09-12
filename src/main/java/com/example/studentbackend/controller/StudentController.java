@@ -1,16 +1,33 @@
 package com.example.studentbackend.controller;
 
 import com.example.studentbackend.model.Student;
+import com.example.studentbackend.payload.LoginRequest;
 import com.example.studentbackend.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-@CrossOrigin(origins="http://localhost:3000")
+import java.util.Optional;
 
+@RestController
+@CrossOrigin(origins="http://localhost:3000")
 public class StudentController {
+
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
 //    List<Student> students = new ArrayList<>(
 //            Arrays.asList(
 //                    new Student(1, "Tom", "US"),
@@ -19,12 +36,12 @@ public class StudentController {
 //            )
 //    );
 
-    @GetMapping
-    public String displayWelcomeMessage(){
-        return "<center><h1>Welcome to the Spring Boot Security!!!!</h1></center>";
-    }
     // Mappings - URL endpoints
     // Get the list of all student
+    @GetMapping
+    public String getWelcomeMessage(){
+        return "<h1> Welcome to the world of Spring Boot!!!</h1>";
+    }
     @GetMapping("/listStudents")
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
@@ -58,5 +75,27 @@ public class StudentController {
         studentObj.setAddress(student.getAddress());
         studentRepository.save(studentObj);
         return studentRepository.findAll();
+    }
+
+    @PostMapping("/login")
+    public String doLogin(@RequestBody LoginRequest loginRequest){
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),loginRequest.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return "Login Successful";
+    }
+
+    @RequestMapping(value="/logout", method=RequestMethod.GET)
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("Logout");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "Logged out successful";
     }
 }
